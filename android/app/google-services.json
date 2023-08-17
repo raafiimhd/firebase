@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "65985740707",
+    "project_id": "studentrec-46da7",
+    "storage_bucket": "studentrec-46da7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:65985740707:android:efb2f60b96728454022416",
+        "android_client_info": {
+          "package_name": "com.example.db_me"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "65985740707-4bsinqe6un541oano9q2o43q6v7vvnrm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdEkTrYqzd-EC80Iy87HoQtVyBUNpiNSg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "65985740707-4bsinqe6un541oano9q2o43q6v7vvnrm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

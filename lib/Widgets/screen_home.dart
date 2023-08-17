@@ -1,8 +1,8 @@
 
-import 'package:db_me/db/functions/db_functions.dart';
-import 'package:db_me/db/models/Widgets/add_student_widgets.dart';
-import 'package:db_me/db/models/Widgets/list_student_widgets.dart';
-import 'package:db_me/db/models/Widgets/search_db.dart';
+import 'package:db_me/Widgets/add_student_widgets.dart';
+import 'package:db_me/Widgets/editpage.dart';
+import 'package:db_me/Widgets/list_student_widgets.dart';
+import 'package:db_me/Widgets/search_db.dart';
 import 'package:flutter/material.dart';
 
 class ScreenHome extends StatefulWidget {
@@ -15,13 +15,14 @@ class ScreenHome extends StatefulWidget {
 class _ScreenHomeState extends State<ScreenHome> {
   int index=0;
   final pages=[
-     AddStudentWidget(),
+     const AddStudentWidget(),
       SearchWidget(),
-     ListStudentWidget()
+     const ListStudentWidget(),
+     
   ];
   @override
   Widget build(BuildContext context) {
-    getAllStudents();
+    // getAllStudents();
     return Scaffold(
       body: pages[index],
         //  appBar: AppBar(

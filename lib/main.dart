@@ -1,16 +1,20 @@
-
-import 'package:db_me/db/models/Widgets/screen_home.dart';
-import 'package:db_me/db/models/db_models.dart';
+import 'package:db_me/Widgets/screen_home.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/adapters.dart';
 
-
-Future<void> main () async{
+Future<void> main() async {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // await Hive.initFlutter();
+  // if(!Hive.isAdapterRegistered(StudentModelAdapter().typeId)){
+  //   Hive.registerAdapter(StudentModelAdapter());
+  // }
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  if(!Hive.isAdapterRegistered(StudentModelAdapter().typeId)){
-    Hive.registerAdapter(StudentModelAdapter());
-  }
+  await Firebase.initializeApp(options: const FirebaseOptions(
+    apiKey: "AIzaSyC35vAaeNtl74Y9Yi04DKQwKL8F-CmtT-o",
+      projectId: "studentrec-46da7",
+      messagingSenderId: "65985740707",
+      appId: "1:65985740707:web:9d0cd93a0efb18c3022416",
+    ));
   runApp(const MyApp());
 }
 
@@ -23,9 +27,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.black,
       ),
-    home: ScreenHome(),
-    debugShowCheckedModeBanner: false,
+      home: const ScreenHome(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
-
