@@ -1,35 +1,31 @@
 import 'package:db_me/Widgets/editpage.dart';
+import 'package:db_me/db/models/model.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class ScreenDetails extends StatelessWidget {
-  ScreenDetails({
-    super.key,
-    required this.name,
-    required this.age,
-    required this.domain,
-    required this.contact,
-  });
+  ScreenDetails(
+      {super.key,
+      required this.student,
+      required this.index});
 
-  String name;
-  int age;
-  String domain;
-  int contact;
+  StudentModel student;
+  int index;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Student Details'),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
         actions: [
           IconButton(
               onPressed: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (ctx) => Editpage(
-                      name:name ,
-                      age: age,
-                      domain: domain,
-                      contact: contact, 
-                    )));
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (ctx) => Editpage(
+                          student: student,
+                          index: index,
+                        )));
               },
               icon: Icon(Icons.edit))
         ],
@@ -38,22 +34,23 @@ class ScreenDetails extends StatelessWidget {
         child: Container(
           child: Center(
             child: Column(children: [
+              // Text('hhjhhfk'),
               Text(
-                "Name:$name",
+                "Name:${student.name}",
                 style: const TextStyle(
                   fontSize: 20,
                 ),
               ),
               Text(
-                'Age:$age',
+                'Age:${student.age}',
                 style: const TextStyle(fontSize: 20),
               ),
               Text(
-                'Domain:$domain',
+                'Domain:${student.domain}',
                 style: const TextStyle(fontSize: 20),
               ),
               Text(
-                'Conatct:$contact',
+                'Conatct:${student.contact}',
                 style: const TextStyle(fontSize: 20),
               ),
             ]),

@@ -3,18 +3,22 @@ import 'package:db_me/Widgets/student_details.dart';
 import 'package:db_me/db/models/model.dart';
 import 'package:flutter/material.dart';
 
-class ListStudentWidget extends StatelessWidget {
+class ListStudentWidget extends StatefulWidget {
   // final String? selectedImage;
-  const ListStudentWidget({
-    Key? key,
-  });
+  const ListStudentWidget({super.key});
 
+  @override
+  State<ListStudentWidget> createState() => _ListStudentWidgetState();
+}
+
+class _ListStudentWidgetState extends State<ListStudentWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Student List'),
           centerTitle: true,
+          backgroundColor: Colors.blue,
         ),
         body: SafeArea(
           child: FutureBuilder<List<StudentModel>>(
@@ -37,7 +41,7 @@ class ListStudentWidget extends StatelessWidget {
                         title: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            student.name,
+                            student.name!,
                             style: const TextStyle(
                               fontSize: 20,
                             ),
@@ -54,7 +58,7 @@ class ListStudentWidget extends StatelessWidget {
                         ),
                         trailing: GestureDetector(
                           onTap: () {
-                            _showDialog(ctx, index);
+                            _showDialog(ctx, index, student.id!);
                           },
                           child: const Icon(
                             Icons.delete_forever,
@@ -66,10 +70,8 @@ class ListStudentWidget extends StatelessWidget {
                           Navigator.of(ctx).push(
                             MaterialPageRoute(
                               builder: (context) => ScreenDetails(
-                                name: student.name,
-                                age: student.age,
-                                domain: student.domain,
-                                contact: student.contact,
+                                student: student,
+                                index: index,
                               ),
                             ),
                           );
@@ -82,7 +84,7 @@ class ListStudentWidget extends StatelessWidget {
         ));
   }
 
-  Future<void> _showDialog(BuildContext context, int index) async {
+  Future<void> _showDialog(BuildContext context, int index, String id) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -90,9 +92,13 @@ class ListStudentWidget extends StatelessWidget {
           title: const Text('Are you sure you want to delete this student?'),
           actions: [
             TextButton(
-              onPressed: () {
+              onPressed: () async{
                 // deleteStudent(index);
+                await delete(id);
                 Navigator.of(context).pop();
+                setState(() {
+                  
+                });
               },
               child: const Text('Yes'),
             ),

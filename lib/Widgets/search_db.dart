@@ -1,7 +1,9 @@
-import 'package:db_me/db/functions/db_functions.dart';
 import 'package:db_me/Widgets/student_details.dart';
+import 'package:db_me/db/functions/db_functions.dart';
 import 'package:db_me/db/models/model.dart';
 import 'package:flutter/material.dart';
+
+
 
 class SearchWidget extends StatefulWidget {
   @override
@@ -29,13 +31,15 @@ class _SearchWidgetState extends State<SearchWidget> {
     setState(() {
       _filteredStudents = studentListNotifier.value
           .where((student) =>
-              student.name.toLowerCase().contains(_searchQuery.toLowerCase()))
+              student.name!.toLowerCase().contains(_searchQuery.toLowerCase()))
           .toList();
+      // print(_filteredStudents);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    fetchAndPopulateStudents();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Search'),
@@ -66,18 +70,17 @@ class _SearchWidgetState extends State<SearchWidget> {
                   children: [
                     ListTile(
                       onTap: () {
+                        // print('hbajhkha');
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => ScreenDetails(
-                              name: _filteredStudents[index].name,
-                              age: _filteredStudents[index].age,
-                              contact: _filteredStudents[index].contact,
-                              domain: _filteredStudents[index].domain,
+                              student: _filteredStudents[index],
+                              index: index,
                             ),
                           ),
                         );
                       },
-                      title: Text(_filteredStudents[index].name),
+                      title: Text(_filteredStudents[index].name!),
                     ),
                     const Divider(),
                   ],
@@ -88,5 +91,10 @@ class _SearchWidgetState extends State<SearchWidget> {
         ],
       ),
     );
+  }
+
+  Future<void> fetchAndPopulateStudents() async {
+    final students = await FirebaseService().fetchStudents();
+    studentListNotifier.value = students;
   }
 }

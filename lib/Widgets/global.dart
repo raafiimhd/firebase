@@ -1,6 +1,5 @@
 
 
+import 'dart:io';
 
-import 'dart:typed_data';
-
-Uint8List? images;
+File? images;

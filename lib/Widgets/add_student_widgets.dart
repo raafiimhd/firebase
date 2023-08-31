@@ -1,34 +1,68 @@
-import 'dart:typed_data';
+import 'dart:html';
+import 'package:file_picker/file_picker.dart';
 import 'package:db_me/Widgets/list_student_widgets.dart';
 import 'package:db_me/db/functions/db_functions.dart';
+import 'package:db_me/db/models/model.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker_web/image_picker_web.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+// import 'package:universal_html/html.dart';
+import 'dart:html' as html;
 
-import 'global.dart';
+File? file;
 
-Uint8List? _cloudFile;
+final nameController = TextEditingController();
+final ageController = TextEditingController();
+final domainController = TextEditingController();
+final contactController = TextEditingController();
+String? downloadURL;
 
 class AddStudentWidget extends StatefulWidget {
-  const AddStudentWidget({Key? key}) : super(key: key);
+  String? imapath;
+   AddStudentWidget({Key? key}) : super(key: key);
 
   @override
   State<AddStudentWidget> createState() => _AddStudentWidgetState();
 }
 
 class _AddStudentWidgetState extends State<AddStudentWidget> {
+  XFile? _image;
   final _formKey = GlobalKey<FormState>();
   bool isVisible = false;
-
-  final _nameController = TextEditingController();
-  final _ageController = TextEditingController();
-  final _domainController = TextEditingController();
-  final _contactController = TextEditingController();
-
+  Uint8List webImage = Uint8List(8);
+  String selectImage = '';
+  PlatformFile? pickedfile;
+  
   @override
   Widget build(BuildContext context) {
+   double progress = 0.0;
+    // uploadToStorage() {
+    //   final input = FileUploadInputElement()..accept = 'image/*';
+    //   FirebaseStorage fs = FirebaseStorage.instance;
+    //   input.click();
+    //   input.onChange.listen((event) {
+    //     final file = input.files!.first;
+    //     print(file.toString());
+    //     final reader = FileReader();
+    //     reader.readAsDataUrl(file);
+    //     reader.onLoadEnd.listen((event) async {
+    //       var snapshot = await fs.ref().child('newfile').putBlob(file);
+    //       String dowloadImg = await snapshot.ref.getDownloadURL();
+    //       setState(() {
+    //         downloadURL = dowloadImg;
+    //       });
+    //     });
+    //   });
+    // }
+
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Student view'),
+        backgroundColor: Colors.blue,
+        centerTitle: true,
       ),
       body: Container(
         child: SingleChildScrollView(
@@ -43,29 +77,61 @@ class _AddStudentWidgetState extends State<AddStudentWidget> {
                     const SizedBox(
                       height: 30,
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        imagepicker();
-                      },
-                      child: Stack(
-                        children: [
-                          _cloudFile == null
-                              ? const CircleAvatar(
-                                  backgroundColor: Colors.grey,
-                                  radius: 50,
-                                )
-                              : CircleAvatar(
-                                  backgroundImage: MemoryImage(_cloudFile!),
-                                  radius: 50,
-                                ),
-                          const Padding(
-                            padding: EdgeInsets.only(
-                              left: 46,
-                              right: 10,
-                            ),
-                          )
-                        ],
-                      ),
+                    Column(
+                      children: [
+                        CircleAvatar(
+                                radius: 48,
+                                backgroundImage: NetworkImage(widget.imapath??'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png')),
+                        // ? Container(
+                        //     height: 100,
+                        //     width: 50,
+                        // //   )
+                        // : Image.network(downloadURL!),
+                        ElevatedButton(
+                            onPressed: ()async {
+                                
+                     FilePickerResult? result =
+                      await FilePicker.platform.pickFiles();
+                  if (result != null) {
+                    Uint8List? file = result.files.first.bytes;
+                    String filename = result.files.first.name;
+                    UploadTask task = FirebaseStorage.instance
+                        .ref()
+                        .child("files/images$filename")
+                        .putData(file!);
+                    task.snapshotEvents.listen((event) {
+                      setState(() {
+                        progress = ((event.bytesTransferred.toDouble() /
+                                    event.totalBytes.toDouble()) *
+                                100)
+                            .roundToDouble();
+                        if (progress == 100) {
+                          event.ref.getDownloadURL().then((thumbnailUrl) {
+                            setState(() {
+                              widget.imapath = thumbnailUrl;
+                            });
+                          }
+
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) {
+                              //       return UploadVideo(
+                              //           drovalueId: dropDownValue!["id"],
+                              //           thumbnail: thumbnailUrl);
+                              //     },
+                              //   ),
+                              // ),
+                              );
+                        }
+                      });
+                    });
+                  }
+                },
+                            
+                            child:
+                                const Icon(Icons.photo_camera_front_outlined))
+                      ],
                     ),
                     const SizedBox(
                       height: 10,
@@ -81,7 +147,7 @@ class _AddStudentWidgetState extends State<AddStudentWidget> {
                       height: 40,
                     ),
                     TextFormField(
-                      controller: _nameController,
+                      controller: nameController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your name';
@@ -89,14 +155,17 @@ class _AddStudentWidgetState extends State<AddStudentWidget> {
                           return null;
                         }
                       },
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10)),
                         hintText: 'name',
                       ),
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
-                      controller: _ageController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      controller: ageController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your age';
@@ -104,14 +173,15 @@ class _AddStudentWidgetState extends State<AddStudentWidget> {
                           return null;
                         }
                       },
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10)),
                         hintText: 'age',
                       ),
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
-                      controller: _domainController,
+                      controller: domainController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'please enter your domain';
@@ -119,14 +189,17 @@ class _AddStudentWidgetState extends State<AddStudentWidget> {
                           return null;
                         }
                       },
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10)),
                         hintText: 'domain',
                       ),
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
-                      controller: _contactController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      controller: contactController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please Enter your number';
@@ -136,8 +209,9 @@ class _AddStudentWidgetState extends State<AddStudentWidget> {
                           return null;
                         }
                       },
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10)),
                         hintText: 'contact',
                       ),
                     ),
@@ -146,13 +220,13 @@ class _AddStudentWidgetState extends State<AddStudentWidget> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState!.validate() &&
-                            _cloudFile != null) {
-                          onAddStudentButton();
-                          submit();
+                            _image != null) {
+                          await onAddStudentButton(context, _image!);
+                          submit(context);
                         } else {
-                          if (_cloudFile == null) {
+                          if (_image == null) {
                             setState(() {
                               isVisible = true;
                             });
@@ -175,17 +249,82 @@ class _AddStudentWidgetState extends State<AddStudentWidget> {
     );
   }
 
-  void imagepicker() async {
-    final pickedFile = await ImagePickerWeb.getImageAsBytes();
+  // Future<void> imagepicker() async {
+  //   showDialog(
+  //     context: context,
+  //     builder: (ctx) {
+  //       return Center(
+  //         child: Container(
+  //           decoration: BoxDecoration(
+  //             borderRadius: BorderRadius.circular(16),
+  //             color: Colors.white,
+  //           ),
+  //           width: 200,
+  //           height: 100,
+  //           child: Row(
+  //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //             children: [
+  //               GestureDetector(
+  //                 onTap: () {
+  //                   getImage(ImageSource.camera);
+  //                   Navigator.pop(ctx);
+  //                 },
+  //                 child: const Column(
+  //                   mainAxisAlignment: MainAxisAlignment.center,
+  //                   children: [
+  //                     Icon(Icons.camera_alt_sharp),
+  //                     Text(
+  //                       'Camera',
+  //                       style: TextStyle(
+  //                         decoration: TextDecoration.none,
+  //                         fontSize: 10,
+  //                         color: Colors.black,
+  //                       ),
+  //                     )
+  //                   ],
+  //                 ),
+  //               ),
+  //               GestureDetector(
+  //                 onTap: () {
+  //                   getImage(ImageSource.gallery);
+  //                   Navigator.pop(ctx);
+  //                 },
+  //                 child: const Column(
+  //                   mainAxisAlignment: MainAxisAlignment.center,
+  //                   children: [
+  //                     Icon(Icons.image_search),
+  //                     Text(
+  //                       'Gallery',
+  //                       style: TextStyle(
+  //                         decoration: TextDecoration.none,
+  //                         fontSize: 10,
+  //                         color: Colors.black,
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               )
+  //             ],
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
-    if (pickedFile != null) {
-      setState(() {
-        _cloudFile = pickedFile;
-      });
-    }
-  }
+  // void getImage(ImageSource source) async {
+  //   final image = await ImagePicker().pickImage(source: source);
+  //   if (image == null) {
+  //     return;
+  //   } else {
+  //     final imagepath = XFile(image.path);
+  //     setState(() {
+  //       _image = imagepath;
+  //     });
+  //   }
+  // }
 
-  void submit() async {
+  void submit(BuildContext context) async {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         backgroundColor: Colors.green,
@@ -199,21 +338,25 @@ class _AddStudentWidgetState extends State<AddStudentWidget> {
     );
   }
 
-  Future<void> onAddStudentButton() async {
-    final name = _nameController.text.trim();
-    final age = _ageController.text.trim();
-    final domain = _domainController.text.trim();
-    final contact = _contactController.text.trim();
+  Future<void> onAddStudentButton(BuildContext context, XFile _image) async {
+    final name = nameController.text.trim();
+    final age = ageController.text.trim();
+    final domain = domainController.text.trim();
+    final contact = contactController.text.trim();
     final firebaseService = FirebaseService();
-    bool success = await firebaseService. addStudent(
+    bool success = await firebaseService.addStudent(
       name: name,
-      age: int.parse(age),
+      age: age,
       domain: domain,
-      contact: int.parse(contact),
-      // image: images!,
+      contact: contact,
+      imageUrl: _image,
+      // imageBytes: webImage,
     );
 
     if (success) {
+      List<StudentModel> updatedStudents =
+          await FirebaseService().fetchStudents();
+      studentListNotifier.value = updatedStudents;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: Colors.green,
@@ -224,7 +367,7 @@ class _AddStudentWidgetState extends State<AddStudentWidget> {
       );
 
       Navigator.of(context)
-          .push(MaterialPageRoute(builder: (ctx) => ListStudentWidget()));
+          .push(MaterialPageRoute(builder: (ctx) => const ListStudentWidget()));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
