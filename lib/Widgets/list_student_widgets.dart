@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:db_me/db/functions/db_functions.dart';
 import 'package:db_me/Widgets/student_details.dart';
-import 'package:db_me/db/models/model.dart';
 import 'package:flutter/material.dart';
+
+
 
 class ListStudentWidget extends StatefulWidget {
   // final String? selectedImage;
@@ -14,6 +16,7 @@ class ListStudentWidget extends StatefulWidget {
 class _ListStudentWidgetState extends State<ListStudentWidget> {
   @override
   Widget build(BuildContext context) {
+    fetchStudents();
     return Scaffold(
         appBar: AppBar(
           title: const Text('Student List'),
@@ -21,8 +24,10 @@ class _ListStudentWidgetState extends State<ListStudentWidget> {
           backgroundColor: Colors.blue,
         ),
         body: SafeArea(
-          child: FutureBuilder<List<StudentModel>>(
-              future: FirebaseService().fetchStudents(),
+          child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('StudentDataCollection')
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator(
@@ -34,31 +39,31 @@ class _ListStudentWidgetState extends State<ListStudentWidget> {
                   return const Text('No data available.');
                 } else {
                   return ListView.builder(
-                    itemCount: snapshot.data!.length,
+                    itemCount: snapshot.data!.docs.length,
                     itemBuilder: (ctx, index) {
-                      final student = snapshot.data![index];
+                      final data = AddStudentDataToFirebase.fromMap(
+                          snapshot.data!.docs[index].data());
                       return ListTile(
                         title: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            student.name!,
+                            data.studentName,
                             style: const TextStyle(
                               fontSize: 20,
                             ),
                           ),
                         ),
-                        leading: const Padding(
-                          padding: EdgeInsets.only(top: 10),
+                        leading: Padding(
+                          padding: const EdgeInsets.only(top: 10),
                           child: CircleAvatar(
-                            // backgroundImage: FileImage(
-                            //             File(data.image)
-                            //           ),
+                            backgroundImage: 
+                            NetworkImage(data.profileImage),
                             radius: 50,
                           ),
                         ),
                         trailing: GestureDetector(
                           onTap: () {
-                            _showDialog(ctx, index, student.id!);
+                            _showDialog(ctx, index, data.docid);
                           },
                           child: const Icon(
                             Icons.delete_forever,
@@ -70,8 +75,9 @@ class _ListStudentWidgetState extends State<ListStudentWidget> {
                           Navigator.of(ctx).push(
                             MaterialPageRoute(
                               builder: (context) => ScreenDetails(
-                                student: student,
+                                student: data,
                                 index: index,
+                                imagepath: data.profileImage,
                               ),
                             ),
                           );
@@ -92,13 +98,11 @@ class _ListStudentWidgetState extends State<ListStudentWidget> {
           title: const Text('Are you sure you want to delete this student?'),
           actions: [
             TextButton(
-              onPressed: () async{
+              onPressed: () async {
                 // deleteStudent(index);
-                await delete(id);
+                delete(id);
                 Navigator.of(context).pop();
-                setState(() {
-                  
-                });
+                setState(() {});
               },
               child: const Text('Yes'),
             ),

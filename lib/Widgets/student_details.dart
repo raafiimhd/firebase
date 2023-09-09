@@ -1,16 +1,14 @@
 import 'package:db_me/Widgets/editpage.dart';
-import 'package:db_me/db/models/model.dart';
+import 'package:db_me/db/functions/db_functions.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class ScreenDetails extends StatelessWidget {
-  ScreenDetails(
-      {super.key,
-      required this.student,
-      required this.index});
+  ScreenDetails({super.key, required this.student, required this.index,this.imagepath});
 
-  StudentModel student;
+  AddStudentDataToFirebase student;
   int index;
+  String? imagepath;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,6 +23,7 @@ class ScreenDetails extends StatelessWidget {
                     builder: (ctx) => Editpage(
                           student: student,
                           index: index,
+                          
                         )));
               },
               icon: Icon(Icons.edit))
@@ -35,14 +34,19 @@ class ScreenDetails extends StatelessWidget {
           child: Center(
             child: Column(children: [
               // Text('hhjhhfk'),
+              CircleAvatar(
+                backgroundImage: NetworkImage(
+                  student.profileImage),
+                  radius: 48,
+              ),
               Text(
-                "Name:${student.name}",
+                "Name:${student.studentName}",
                 style: const TextStyle(
                   fontSize: 20,
                 ),
               ),
               Text(
-                'Age:${student.age}',
+                'Age:${student.studentAge}',
                 style: const TextStyle(fontSize: 20),
               ),
               Text(
@@ -50,7 +54,7 @@ class ScreenDetails extends StatelessWidget {
                 style: const TextStyle(fontSize: 20),
               ),
               Text(
-                'Conatct:${student.contact}',
+                'Conatct:${student.contactNumber}',
                 style: const TextStyle(fontSize: 20),
               ),
             ]),

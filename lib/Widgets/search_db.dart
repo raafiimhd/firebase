@@ -1,9 +1,6 @@
 import 'package:db_me/Widgets/student_details.dart';
 import 'package:db_me/db/functions/db_functions.dart';
-import 'package:db_me/db/models/model.dart';
 import 'package:flutter/material.dart';
-
-
 
 class SearchWidget extends StatefulWidget {
   @override
@@ -12,7 +9,7 @@ class SearchWidget extends StatefulWidget {
 
 class _SearchWidgetState extends State<SearchWidget> {
   String _searchQuery = '';
-  List<StudentModel> _filteredStudents = [];
+  List<AddStudentDataToFirebase> _filteredStudents = [];
 
   @override
   void initState() {
@@ -28,12 +25,13 @@ class _SearchWidgetState extends State<SearchWidget> {
   }
 
   void _updateFilteredStudents() {
+    final allStudents = studentListNotifier.value;
     setState(() {
-      _filteredStudents = studentListNotifier.value
-          .where((student) =>
-              student.name!.toLowerCase().contains(_searchQuery.toLowerCase()))
+      _filteredStudents = allStudents
+          .where((student) => student.studentName
+              .toLowerCase()
+              .contains(_searchQuery.toLowerCase()))
           .toList();
-      // print(_filteredStudents);
     });
   }
 
@@ -70,7 +68,6 @@ class _SearchWidgetState extends State<SearchWidget> {
                   children: [
                     ListTile(
                       onTap: () {
-                        // print('hbajhkha');
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => ScreenDetails(
@@ -80,7 +77,7 @@ class _SearchWidgetState extends State<SearchWidget> {
                           ),
                         );
                       },
-                      title: Text(_filteredStudents[index].name!),
+                      title: Text(_filteredStudents[index].studentName),
                     ),
                     const Divider(),
                   ],
@@ -92,9 +89,12 @@ class _SearchWidgetState extends State<SearchWidget> {
       ),
     );
   }
+}
 
-  Future<void> fetchAndPopulateStudents() async {
-    final students = await FirebaseService().fetchStudents();
-    studentListNotifier.value = students;
-  }
+Future<void> fetchAndPopulateStudents() async {
+  // Fetch students from Firestore or your data source
+  final List<AddStudentDataToFirebase> students = await fetchStudents();
+
+  // Update the studentListNotifier with the retrieved data
+  studentListNotifier.value = students;
 }
