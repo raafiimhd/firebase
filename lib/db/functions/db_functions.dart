@@ -2,12 +2,12 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:db_me/Widgets/list_student_widgets.dart';
+import 'package:db_me/presentation/studentviewscreen/list_student_widgets.dart';
 import 'package:db_me/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 ValueNotifier<List<AddStudentDataToFirebase>> studentListNotifier = ValueNotifier([]);
-
+//model
 class AddStudentDataToFirebase {
   String docid;
   String studentName;
@@ -97,7 +97,7 @@ class AddStudentDataToFirebase {
         domain.hashCode;
   }
 }
-
+//for adding
 Future<void> addStudentDetails(
     String docid,
     String studentName,
@@ -123,7 +123,7 @@ Future<void> addStudentDetails(
         MaterialPageRoute(builder: (ctx) => ListStudentWidget()));
   });
 }
-
+// for updating
 Future editStudent(AddStudentDataToFirebase student, String imageUrl) async {
   try {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -142,7 +142,7 @@ Future editStudent(AddStudentDataToFirebase student, String imageUrl) async {
     return false;
   }
 }
-
+//for getting data
 Future<List<AddStudentDataToFirebase>> fetchStudents() async {
   final collection = FirebaseFirestore.instance.collection('StudentDataCollection');
   final querySnapshot = await collection.get();

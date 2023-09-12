@@ -1,4 +1,4 @@
-import 'package:db_me/Widgets/editpage.dart';
+import 'package:db_me/presentation/editingscreen/editpage.dart';
 import 'package:db_me/db/functions/db_functions.dart';
 import 'package:flutter/material.dart';
 

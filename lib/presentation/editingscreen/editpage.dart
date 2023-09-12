@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'list_student_widgets.dart';
+import '../studentviewscreen/list_student_widgets.dart';
 
 class Editpage extends StatefulWidget {
   PlatformFile? imagefile;

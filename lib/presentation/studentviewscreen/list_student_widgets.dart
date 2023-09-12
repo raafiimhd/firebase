@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:db_me/db/functions/db_functions.dart';
-import 'package:db_me/Widgets/student_details.dart';
+import 'package:db_me/presentation/studentdetails/student_details.dart';
 import 'package:flutter/material.dart';
 
 

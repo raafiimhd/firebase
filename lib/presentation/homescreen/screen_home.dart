@@ -1,6 +1,6 @@
-import 'package:db_me/Widgets/add_student_widgets.dart';
-import 'package:db_me/Widgets/list_student_widgets.dart';
-import 'package:db_me/Widgets/search_db.dart';
+import 'package:db_me/presentation/homescreen/add_student_widgets.dart';
+import 'package:db_me/presentation/studentviewscreen/list_student_widgets.dart';
+import 'package:db_me/presentation/search/search_db.dart';
 import 'package:flutter/material.dart';
 
 class ScreenHome extends StatefulWidget {
